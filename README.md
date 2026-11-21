@@ -61,11 +61,11 @@ The package declares iOS 18 or later as its minimum firmware requirement. Actual
 
 Add the official Liquid Glass 26 source to Sileo or Zebra:
 
-`https://mruuid.github.io/-Liquid-Glass-/`
+`https://raw.githubusercontent.com/mruuid/-Liquid-Glass-/gh-pages/`
 
 Open **Sources → Add Source**, paste the URL, and confirm. The repository index is automatically rebuilt when a new GitHub release is published.
 
-[Open the APT repository](https://mruuid.github.io/-Liquid-Glass-/)
+[Open the APT repository](https://raw.githubusercontent.com/mruuid/-Liquid-Glass-/gh-pages/)
 
 ## Installation
 
