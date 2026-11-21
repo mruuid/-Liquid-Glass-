@@ -10,14 +10,14 @@ permissions:
   contents: write
 
 jobs:
-  test:
+  publish:
+    name: Build and publish Sileo / Zebra repository
     runs-on: ubuntu-latest
     steps:
-      - name: Check GitHub token context
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build APT indexes and deploy repository
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          echo "APT repository workflow is running"
-          gh --version
-          test -n "$GH_TOKEN"
+        run: bash scripts/publish-apt-repo.sh
