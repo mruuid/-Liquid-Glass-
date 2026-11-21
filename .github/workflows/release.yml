@@ -15,10 +15,10 @@ permissions:
 
 jobs:
   publish:
-    name: Publish v0.3.0
+    name: Publish Liquid Glass package
     if: >-
       github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.head_commit.message == 'Finalize Liquid Glass 26 v0.3.0'
+      startsWith(github.event.workflow_run.head_commit.message, 'Finalize Liquid Glass 26 v')
     runs-on: ubuntu-latest
 
     steps:
@@ -30,37 +30,42 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           path: dist
 
-      - name: Verify Debian package
+      - name: Verify Debian package and extract version
+        id: package
+        env:
+          COMMIT_MESSAGE: ${{ github.event.workflow_run.head_commit.message }}
         run: |
-          set -e
+          set -euo pipefail
           shopt -s nullglob
           packages=(dist/*.deb)
           test "${#packages[@]}" -eq 1
-          dpkg-deb --info "${packages[0]}"
-          dpkg-deb --field "${packages[0]}" Package | grep -Fx 'com.mruuid.liquidglass26'
-          dpkg-deb --field "${packages[0]}" Version | grep -Fx '0.3.0'
-          dpkg-deb --field "${packages[0]}" Architecture | grep -Fx 'iphoneos-arm64'
+
+          package="${packages[0]}"
+          package_name="$(dpkg-deb --field "$package" Package)"
+          package_version="$(dpkg-deb --field "$package" Version)"
+          package_arch="$(dpkg-deb --field "$package" Architecture)"
+
+          test "$package_name" = "com.mruuid.liquidglass26"
+          test "$package_arch" = "iphoneos-arm64"
+          test "$COMMIT_MESSAGE" = "Finalize Liquid Glass 26 v$package_version"
+
+          echo "version=$package_version" >> "$GITHUB_OUTPUT"
+          dpkg-deb --info "$package"
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.3.0
+          tag_name: v${{ steps.package.outputs.version }}
           target_commitish: ${{ github.event.workflow_run.head_sha }}
-          name: Liquid Glass 26 v0.3.0
+          name: Liquid Glass 26 v${{ steps.package.outputs.version }}
           body: |
-            ## Liquid Glass 26 — v0.3.0
+            ## Liquid Glass 26 — v${{ steps.package.outputs.version }}
 
-            Rootless update for Dopamine on iOS 18.
+            Rootless package for Dopamine on iOS 18.
 
             **Target:** iPhone XR (A12) · iOS 18.7.1
             **Package:** Debian .deb for Sileo / Zebra
             **Architectures:** arm64, arm64e
-
-            ### What's new
-            - Live preference refresh: visible interfaces are marked for layout again after settings change, so most tweaks apply without relaunching apps or respringing.
-            - Improved volume/ringer HUD discovery: scans nested HUD views and recognizes both horizontal and vertical capsule-shaped surfaces.
-            - More complete visual profile invalidation for glass intensity, Reduce Transparency, material refinements, and Performance Mode.
-            - Existing Lock Screen clock, Dock/folder, notification, Control Center, system-bar and accessibility options retained.
 
             This is a development build. CI validates compilation and Debian packaging; it does not replace testing on a physical device. Private SpringBoard class names and layouts can vary between iOS builds.
           files: dist/*.deb
