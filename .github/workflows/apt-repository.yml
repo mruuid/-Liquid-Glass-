@@ -6,13 +6,6 @@ on:
       - main
     paths:
       - ".github/workflows/apt-repository.yml"
-  workflow_run:
-    workflows:
-      - Publish Liquid Glass Release
-    types:
-      - completed
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
@@ -25,9 +18,6 @@ concurrency:
 jobs:
   publish:
     name: Build and publish Sileo / Zebra repository
-    if: >-
-      github.event_name != 'workflow_run' ||
-      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -36,7 +26,7 @@ jobs:
       - name: Install Debian repository tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y dpkg-dev apt-utils
+          sudo apt-get install -y dpkg-dev apt-utils xz-utils
 
       - name: Download all published Debian packages
         env:
@@ -86,6 +76,9 @@ jobs:
 
           apt-ftparchive release . >> Release
 
+          grep -q '^Package: com.mruuid.liquidglass26$' Packages
+          grep -q '^Version: 0.3.0$' Packages
+
       - name: Create repository landing page
         run: |
           cat > public/index.html <<'EOF'
@@ -110,11 +103,10 @@ jobs:
               <h1>Liquid Glass 26</h1>
               <p class="muted">Rootless APT repository for Dopamine · Sileo · Zebra</p>
               <h2>Add this source</h2>
-              <code>https://mruuid.github.io/-Liquid-Glass-/</code>
+              <code>https://raw.githubusercontent.com/mruuid/-Liquid-Glass-/gh-pages/</code>
               <p>Open Sileo or Zebra, choose Sources → Add Source, and paste the URL above.</p>
-              <h2>Packages</h2>
-              <p><a href="./Packages.gz">Packages.gz</a> · <a href="./Release">Release metadata</a></p>
-              <p class="muted">Packages are built for rootless jailbreak environments. Check each package's firmware and dependency requirements before installing.</p>
+              <p><a href="./Packages.gz">Packages.gz</a> · <a href="./Packages.xz">Packages.xz</a> · <a href="./Release">Release metadata</a></p>
+              <p class="muted">Packages are built for rootless jailbreak environments. Check firmware and dependencies before installing.</p>
               <p><a href="https://github.com/mruuid/-Liquid-Glass-/releases">GitHub Releases</a> · <a href="https://github.com/mruuid/-Liquid-Glass-">Source code</a></p>
             </main>
           </body>
