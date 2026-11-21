@@ -112,14 +112,17 @@ jobs:
           EOF
 
       - name: Publish APT repository branch
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
-          publish_branch: gh-pages
-          force_orphan: true
-          user_name: github-actions[bot]
-          user_email: 41898282+github-actions[bot]@users.noreply.github.com
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git -C public init -b gh-pages
+          git -C public config user.name "github-actions[bot]"
+          git -C public config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C public add --all
+          git -C public commit -m "Publish APT repository"
+          git -C public remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git -C public push --force origin gh-pages
 
       - name: Print repository URL
         run: echo "APT repository: https://raw.githubusercontent.com/mruuid/-Liquid-Glass-/gh-pages/"
