@@ -38,13 +38,39 @@
         <dict>
             <key>cell</key><string>PSGroupCell</string>
             <key>label</key><string>System Interfaces</string>
-            <key>footerText</key><string>Stability hotfix: SpringBoard effects (Lock Screen, volume HUD, Dock, folders and Control Center) are temporarily disabled. UIKit system bars in selected apps remain enabled.</string>
+            <key>footerText</key><string>Styles navigation bars, tab bars and toolbars in supported apps. Changes apply live.</string>
         </dict>
         <dict>
             <key>cell</key><string>PSSwitchCell</string>
             <key>label</key><string>System Bars</string>
             <key>defaults</key><string>com.mruuid.liquidglass26</string>
             <key>key</key><string>SystemPanelsEnabled</string>
+            <key>default</key><true/>
+        </dict>
+        <dict>
+            <key>cell</key><string>PSGroupCell</string>
+            <key>label</key><string>SpringBoard Effects</string>
+            <key>footerText</key><string>Apply the Liquid Glass material to the Lock Screen clock, Dock, folders, Control Center and the volume HUD.</string>
+        </dict>
+        <dict>
+            <key>cell</key><string>PSSwitchCell</string>
+            <key>label</key><string>Lock Screen Clock</string>
+            <key>defaults</key><string>com.mruuid.liquidglass26</string>
+            <key>key</key><string>LockScreenClockEnabled</string>
+            <key>default</key><true/>
+        </dict>
+        <dict>
+            <key>cell</key><string>PSSwitchCell</string>
+            <key>label</key><string>Dock and Folders</string>
+            <key>defaults</key><string>com.mruuid.liquidglass26</string>
+            <key>key</key><string>DockAndFoldersEnabled</string>
+            <key>default</key><true/>
+        </dict>
+        <dict>
+            <key>cell</key><string>PSSwitchCell</string>
+            <key>label</key><string>Volume HUD</string>
+            <key>defaults</key><string>com.mruuid.liquidglass26</string>
+            <key>key</key><string>VolumeHUDEnabled</string>
             <key>default</key><true/>
         </dict>
         <dict>
@@ -58,6 +84,15 @@
             <key>defaults</key><string>com.mruuid.liquidglass26</string>
             <key>key</key><string>PerformanceMode</string>
             <key>default</key><false/>
+        </dict>
+        <dict>
+            <key>cell</key><string>PSGroupCell</string>
+            <key>footerText</key><string>SpringBoard effects are applied after a respring.</string>
+        </dict>
+        <dict>
+            <key>cell</key><string>PSButtonCell</string>
+            <key>label</key><string>Respring</string>
+            <key>action</key><string>respring</string>
         </dict>
     </array>
 </dict>

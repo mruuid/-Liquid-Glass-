@@ -1,8 +1,8 @@
 Package: com.mruuid.liquidglass26
 Name: Liquid Glass 26
-Version: 0.3.1
+Version: 0.3.2
 Architecture: iphoneos-arm64
-Description: Stability hotfix for iOS 18; disables experimental SpringBoard injection.
+Description: Liquid Glass material for iOS 18: Lock Screen clock, Dock, folders, volume HUD and system bars. Rootless.
 Maintainer: mruuid
 Author: mruuid
 Section: Tweaks
