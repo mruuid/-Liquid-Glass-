@@ -72,4 +72,4 @@ jobs:
       - name: Rebuild APT repository
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh workflow run apt-repository.yml --repo "$GITHUB_REPOSITORY"
+        run: gh workflow run repository.yml --repo "$GITHUB_REPOSITORY"
