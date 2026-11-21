@@ -1,8 +1,8 @@
 Package: com.mruuid.liquidglass26
 Name: Liquid Glass 26
-Version: 0.3.0
+Version: 0.3.1
 Architecture: iphoneos-arm64
-Description: Liquid Glass visual tweak for iOS 18 with live settings refresh and improved system HUD targeting.
+Description: Stability hotfix for iOS 18; disables experimental SpringBoard injection.
 Maintainer: mruuid
 Author: mruuid
 Section: Tweaks
