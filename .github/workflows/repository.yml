@@ -4,126 +4,20 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 permissions:
   contents: write
 
-concurrency:
-  group: apt-repository
-  cancel-in-progress: true
-
 jobs:
-  publish:
-    name: Build and publish Sileo / Zebra repository
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Debian repository tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y dpkg-dev apt-utils xz-utils
-
-      - name: Download all published Debian packages
+      - name: Check GitHub token context
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          mkdir -p public/debs
-
-          mapfile -t tags < <(
-            gh release list --repo "$GITHUB_REPOSITORY" --limit 100 \
-              --json tagName,isDraft,isPrerelease \
-              --jq '.[] | select(.isDraft == false and .isPrerelease == false) | .tagName'
-          )
-
-          if [ "${#tags[@]}" -eq 0 ]; then
-            echo "No published releases found." >&2
-            exit 1
-          fi
-
-          for tag in "${tags[@]}"; do
-            echo "Downloading Debian assets from $tag"
-            gh release download "$tag" --repo "$GITHUB_REPOSITORY" \
-              --pattern '*.deb' --dir public/debs
-          done
-
-          compgen -G 'public/debs/*.deb' >/dev/null
-
-      - name: Generate APT package indexes
-        run: |
-          set -euo pipefail
-          cd public
-
-          dpkg-scanpackages --multiversion debs /dev/null > Packages
-          gzip -n -9c Packages > Packages.gz
-          bzip2 -9c Packages > Packages.bz2
-          xz -9e -c Packages > Packages.xz
-
-          cat > Release <<'EOF'
-          Origin: mruuid
-          Label: Liquid Glass 26
-          Suite: stable
-          Codename: stable
-          Architectures: iphoneos-arm64
-          Components: main
-          Description: Rootless Liquid Glass packages for Dopamine, Sileo and Zebra
-          EOF
-
-          apt-ftparchive release . >> Release
-
-          grep -q '^Package: com.mruuid.liquidglass26$' Packages
-          grep -q '^Version: 0.3.0$' Packages
-          grep -q '^SHA256:' Packages
-
-      - name: Create repository landing page
-        run: |
-          cat > public/index.html <<'EOF'
-          <!doctype html>
-          <html lang="en">
-          <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>Liquid Glass 26 APT Repository</title>
-            <style>
-              :root { color-scheme: dark; }
-              body { margin: 0; padding: 48px 20px; background: #101319; color: #f4f6fb; font: 16px/1.6 -apple-system, BlinkMacSystemFont, sans-serif; }
-              main { max-width: 760px; margin: auto; padding: 32px; border: 1px solid #343b49; border-radius: 24px; background: #191f2b; }
-              h1 { margin-top: 0; letter-spacing: -.04em; }
-              code { display: block; overflow-wrap: anywhere; padding: 14px; border-radius: 12px; background: #0c1017; color: #b9d9ff; }
-              a { color: #9cc8ff; }
-              .muted { color: #aab4c5; }
-            </style>
-          </head>
-          <body>
-            <main>
-              <h1>Liquid Glass 26</h1>
-              <p class="muted">Rootless APT repository for Dopamine · Sileo · Zebra</p>
-              <h2>Add this source</h2>
-              <code>https://raw.githubusercontent.com/mruuid/-Liquid-Glass-/gh-pages/</code>
-              <p>Open Sileo or Zebra, choose Sources → Add Source, and paste the URL above.</p>
-              <p><a href="./Packages.gz">Packages.gz</a> · <a href="./Packages.xz">Packages.xz</a> · <a href="./Release">Release metadata</a></p>
-              <p class="muted">Packages are built for rootless jailbreak environments. Check firmware and dependencies before installing.</p>
-              <p><a href="https://github.com/mruuid/-Liquid-Glass-/releases">GitHub Releases</a> · <a href="https://github.com/mruuid/-Liquid-Glass-">Source code</a></p>
-            </main>
-          </body>
-          </html>
-          EOF
-
-      - name: Publish APT repository branch
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          git -C public init -b gh-pages
-          git -C public config user.name "github-actions[bot]"
-          git -C public config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C public add --all
-          git -C public commit -m "Publish APT repository"
-          git -C public remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git -C public push --force origin gh-pages
-
-      - name: Print repository URL
-        run: echo "APT repository: https://raw.githubusercontent.com/mruuid/-Liquid-Glass-/gh-pages/"
+          echo "APT repository workflow is running"
+          gh --version
+          test -n "$GH_TOKEN"
