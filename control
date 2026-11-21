@@ -1,8 +1,8 @@
 Package: com.mruuid.liquidglass26
 Name: Liquid Glass 26
-Version: 0.2.0
+Version: 0.3.0
 Architecture: iphoneos-arm64
-Description: Expanded Liquid Glass simulation for iOS 18 with Lock Screen clock, volume HUD, refined materials and motion.
+Description: Liquid Glass visual tweak for iOS 18 with live settings refresh and improved system HUD targeting.
 Maintainer: mruuid
 Author: mruuid
 Section: Tweaks
