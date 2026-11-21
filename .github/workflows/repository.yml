@@ -1,0 +1,14 @@
+name: APT Repository Publisher
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check workflow execution
+        run: echo "APT repository workflow is running."
