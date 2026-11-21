@@ -71,7 +71,9 @@ static UIBlurEffect *LGCreateGlassMaterial(void) {
             return [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemMaterial];
         }
 
-        if (LGGlassIntensity() < 0.45) {
+        if (LGGlassIntensity() < 0.45 ||
+            LGPreferenceEnabled(@"PerformanceMode", NO) ||
+            NSProcessInfo.processInfo.isLowPowerModeEnabled) {
             return [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemUltraThinMaterial];
         }
 
@@ -145,7 +147,9 @@ static void LGAddSpecularHighlight(UIVisualEffectView *glassView) {
 
 static void LGConfigureGlassView(UIVisualEffectView *glassView, CGFloat radius, BOOL isHUD) {
     NSInteger profile = (NSInteger)round(LGGlassIntensity() * 100.0) +
-                        (LGReduceTransparency() ? 1000 : 0);
+                        (LGReduceTransparency() ? 1000 : 0) +
+                        (LGPreferenceEnabled(@"iOS27RefinementsEnabled", YES) ? 2000 : 0) +
+                        (LGPreferenceEnabled(@"PerformanceMode", NO) ? 4000 : 0);
 
     if (![objc_getAssociatedObject(glassView, kLGGlassProfileKey) isEqual:@(profile)]) {
         glassView.effect = LGCreateGlassMaterial();
@@ -163,9 +167,16 @@ static void LGConfigureGlassView(UIVisualEffectView *glassView, CGFloat radius, 
         );
     }
 
-    LGAddSpecularHighlight(glassView);
-    CAGradientLayer *gradient = objc_getAssociatedObject(glassView, kLGGlassGradientKey);
-    gradient.frame = glassView.contentView.bounds;
+    if (LGPreferenceEnabled(@"PerformanceMode", NO) || LGReduceTransparency()) {
+        CAGradientLayer *oldGradient = objc_getAssociatedObject(glassView, kLGGlassGradientKey);
+        [oldGradient removeFromSuperlayer];
+        objc_setAssociatedObject(glassView, kLGGlassGradientKey, nil,
+                                 OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    } else {
+        LGAddSpecularHighlight(glassView);
+        CAGradientLayer *gradient = objc_getAssociatedObject(glassView, kLGGlassGradientKey);
+        gradient.frame = glassView.contentView.bounds;
+    }
     if (isHUD && LGPreferenceEnabled(@"iOS27RefinementsEnabled", YES)) {
         glassView.layer.shadowColor = [UIColor colorWithWhite:0.0 alpha:1.0].CGColor;
         glassView.layer.shadowOpacity = 0.12;
@@ -187,6 +198,8 @@ static void LGApplyNavigationBarAppearance(UINavigationBar *bar) {
             bar.scrollEdgeAppearance = [original copy];
             bar.compactAppearance = [original copy];
         }
+        objc_setAssociatedObject(bar, kLGNavAppearanceAppliedKey, nil,
+                                 OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         return;
     }
 
@@ -233,6 +246,8 @@ static void LGApplyTabBarAppearance(UITabBar *bar) {
             bar.standardAppearance = [original copy];
             bar.scrollEdgeAppearance = [original copy];
         }
+        objc_setAssociatedObject(bar, kLGTabAppearanceAppliedKey, nil,
+                                 OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         return;
     }
 
@@ -278,6 +293,8 @@ static void LGApplyToolbarAppearance(UIToolbar *toolbar) {
             toolbar.standardAppearance = [original copy];
             toolbar.compactAppearance = [original copy];
         }
+        objc_setAssociatedObject(toolbar, kLGToolbarAppearanceAppliedKey, nil,
+                                 OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         return;
     }
 
@@ -409,13 +426,6 @@ static void LGApplyLockScreenClock(UIView *dateView) {
     glassView.autoresizingMask = UIViewAutoresizingNone;
     LGConfigureGlassView(glassView, MIN(30.0, CGRectGetHeight(glassFrame) * 0.42), NO);
 
-    timeLabel.layer.shadowColor = [UIColor colorWithWhite:1.0 alpha:0.55].CGColor;
-    timeLabel.layer.shadowOpacity = 0.18;
-    timeLabel.layer.shadowRadius = 8.0;
-    timeLabel.layer.shadowOffset = CGSizeMake(0.0, 0.0);
-
-    objc_setAssociatedObject(dateView, kLGClockLabelKey, timeLabel,
-                             OBJC_ASSOCIATION_ASSIGN);
     if (isNew) LGAnimateGlassEntrance(glassView, NO);
 }
 
@@ -583,8 +593,6 @@ static void LiquidGlassInitialize(void) {
             NULL,
             CFNotificationSuspensionBehaviorDeliverImmediately
         );
-
-        if (!LGPreferenceEnabled(@"Enabled", YES)) return;
 
         LGInstallUIKitHooks();
 
