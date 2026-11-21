@@ -10,7 +10,7 @@
 [![Jailbreak](https://img.shields.io/badge/jailbreak-Dopamine-purple)](#requirements)
 [![Package](https://img.shields.io/badge/package-rootless-orange)](#installation)
 
-**Current version: 0.3.0**
+**Current version: 0.3.1**
 
 </div>
 
@@ -26,13 +26,19 @@ The tweak works with existing UIKit and SpringBoard interfaces. It does not repl
 
 | Area | What it does |
 | --- | --- |
-| **Lock Screen** | Adds a rounded glass panel behind the native large clock label while keeping Apple's time and date rendering. |
-| **Volume & ringer HUD** | Applies glass styling to supported horizontal or vertical HUD capsule views. |
 | **System bars** | Styles navigation bars, tab bars and toolbars in selected Apple apps. |
-| **Dock & folders** | Adds translucent material to supported SpringBoard Dock and folder surfaces. |
-| **Notifications & Control Center** | Adds glass treatments to supported notification and Control Center containers. |
-| **Material refinements** | Adjustable intensity, subtle highlights, defined edges and optional spring entrance motion. |
-| **Performance** | Reuses visual-effect views, avoids rebuilding them on every layout pass, and offers a lightweight mode. |
+| **Material refinements** | Adjustable intensity, subtle highlights, defined edges and optional spring entrance motion in supported app interfaces. |
+| **Performance** | Reuses visual-effect views and offers a lightweight mode. |
+| **SpringBoard effects** | Temporarily disabled in v0.3.1 as a safety measure while private system-view hooks are validated on a physical device. |
+
+## What's new in v0.3.1
+
+- **Safe Mode hotfix.** The tweak is no longer injected into SpringBoard by default. Private hooks for the Lock Screen clock, volume/ringer HUD, Dock, folders, notifications and Control Center are temporarily paused.
+- **UIKit-only mode.** Navigation bars, tab bars and toolbars remain enabled in selected Apple apps.
+- **Safer installation.** Removed the forced SpringBoard restart from package installation, so installing the hotfix does not deliberately terminate SpringBoard.
+- The experimental SpringBoard hook code remains in the source but is not enabled by the package's default configuration.
+
+This is a conservative compatibility measure, not proof of the exact crash cause. The earlier package combined several undocumented SpringBoard hooks, and the crash log from the affected device is not yet available. The private effects will be restored individually only after they can be verified safely.
 
 ## What's new in v0.3.0
 
@@ -74,12 +80,12 @@ The APT index includes all published Liquid Glass versions for version selection
 ## Installation
 
 1. Open **[GitHub Releases](https://github.com/mruuid/-Liquid-Glass-/releases)**.
-2. Download `com.mruuid.liquidglass26_0.3.0_iphoneos-arm64.deb` from **Liquid Glass 26 v0.3.0**.
+2. Download `com.mruuid.liquidglass26_0.3.1_iphoneos-arm64.deb` from **Liquid Glass 26 v0.3.1**.
 3. Open the downloaded package in Sileo or Zebra and install it.
 4. Respring if requested by the package manager.
 5. Open **Settings → Liquid Glass 26** to configure the effects.
 
-[**Download v0.3.0 (.deb)**](https://github.com/mruuid/-Liquid-Glass-/releases/download/v0.3.0/com.mruuid.liquidglass26_0.3.0_iphoneos-arm64.deb)
+[**Download v0.3.1 (.deb)**](https://github.com/mruuid/-Liquid-Glass-/releases/download/v0.3.1/com.mruuid.liquidglass26_0.3.1_iphoneos-arm64.deb)
 
 ## Settings
 
@@ -100,11 +106,11 @@ The tweak also respects the system's **Reduce Motion**, **Reduce Transparency** 
 
 ## Compatibility & limitations
 
-Liquid Glass 26 is a visual adaptation for selected iOS 18 views, not a complete iOS 26 interface port.
+Liquid Glass 26 is a visual adaptation for selected iOS 18 views, not a complete iOS 26 interface port. In v0.3.1, SpringBoard injection is intentionally disabled to avoid the Safe Mode regression reported with earlier builds.
 
 - The Lock Screen retains Apple's native iOS 18 clock layout. This tweak does not add wallpaper depth/parallax, subject-aware clock repositioning or a replacement clock renderer.
 - Only the listed and supported system surfaces are styled. It does not restyle every Control Center module, widget, app icon or third-party app.
-- Volume, ringer, notification, Dock, folder and Control Center hooks rely on private SpringBoard classes. Apple may rename or restructure those classes between point releases.
+- Private SpringBoard effects (Lock Screen clock, volume/ringer HUD, Dock, folders, notifications and Control Center) are disabled in v0.3.1. They rely on undocumented classes and will remain disabled until individually verified on-device.
 - Visual appearance can differ by wallpaper, display settings, accessibility options and individual app layouts.
 
 **Device testing status:** GitHub Actions can verify compilation and Debian packaging, but it cannot validate SpringBoard behavior on a physical iPhone. The package should be treated as a development build until it has been tested on the target device.
@@ -118,7 +124,7 @@ make clean
 make package FINALPACKAGE=1
 ```
 
-The rootless package is written to `packages/`. The project builds for `arm64` and `arm64e` and includes the Preferences bundle.
+The rootless package is written to `packages/`. The project builds for `arm64` and `arm64e` and includes the Preferences bundle. The v0.3.1 package does not inject into SpringBoard; it styles supported UIKit bars in selected apps.
 
 GitHub Actions automatically builds the Debian package on pushes to `main`, pull requests and manual workflow dispatches. Successful builds are uploaded as the `liquid-glass-deb` workflow artifact. The release workflow verifies package identity, version and architecture before publishing a tagged release.
 
