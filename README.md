@@ -57,6 +57,16 @@ The four original preview images requested for the README are not present in the
 
 The package declares iOS 18 or later as its minimum firmware requirement. Actual support depends on the availability and layout of private SpringBoard view classes on the installed iOS build.
 
+## APT Repository (Sileo / Zebra)
+
+Add the official Liquid Glass 26 source to Sileo or Zebra:
+
+`https://mruuid.github.io/-Liquid-Glass-/`
+
+Open **Sources → Add Source**, paste the URL, and confirm. The repository index is automatically rebuilt when a new GitHub release is published.
+
+[Open the APT repository](https://mruuid.github.io/-Liquid-Glass-/)
+
 ## Installation
 
 1. Open **[GitHub Releases](https://github.com/mruuid/-Liquid-Glass-/releases)**.
