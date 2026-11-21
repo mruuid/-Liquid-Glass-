@@ -97,9 +97,7 @@ Open **Settings → Liquid Glass 26**.
 | Glass Intensity | Adjusts the strength of the glass tint and material profile. |
 | iOS 27 Material Refinements | Enables stronger highlights, edge contrast and refined entrance motion. This is an approximation, not Apple's iOS 27 renderer. |
 | System Bars | Toggles navigation bars, tab bars and toolbars. |
-| Lock Screen Clock | Toggles the glass surface behind the native Lock Screen clock. |
-| Volume and Ringer HUD | Toggles supported volume and ringer HUD surfaces. |
-| Dock and Folders | Toggles supported Dock and folder surfaces. |
+| SpringBoard Effects | Temporarily unavailable in v0.3.1 while private system hooks are being validated. |
 | Performance Mode | Reduces blur complexity and disables entrance animations. |
 
 The tweak also respects the system's **Reduce Motion**, **Reduce Transparency** and **Low Power Mode** settings.
