@@ -7,7 +7,6 @@
         <key>bundle</key><string>LiquidGlassPrefs</string>
         <key>cell</key><string>PSLinkCell</string>
         <key>detail</key><string>LGRootListController</string>
-        <key>icon</key><string>LiquidGlass</string>
         <key>isController</key><true/>
         <key>label</key><string>Liquid Glass 26</string>
     </dict>
