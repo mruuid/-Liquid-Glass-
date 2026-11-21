@@ -6,6 +6,8 @@ on:
       - main
     tags:
       - "v*"
+    paths-ignore:
+      - ".github/workflows/release.yml"
   pull_request:
   workflow_dispatch:
 
