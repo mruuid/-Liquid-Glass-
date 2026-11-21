@@ -29,16 +29,16 @@ Build on macOS or Linux with Theos installed:
 make package FINALPACKAGE=1
 ```
 
-The package is written to `packages/`. The GitHub Actions workflow also builds the package and uploads the `.deb` as a workflow artifact.
+The package is written to `packages/`. GitHub Actions also builds the package and uploads the `.deb` as a workflow artifact.
 
 ## Install
 
-1. Open the repository's **Actions** tab on GitHub.
-2. Open the latest successful **Build Liquid Glass** workflow.
-3. Download the `liquid-glass-deb` artifact and extract the `.deb`.
-4. Install the rootless package using Sileo or Zebra.
+1. Open the [Releases](https://github.com/mruuid/-Liquid-Glass-/releases) page.
+2. Download `com.mruuid.liquidglass26_0.1.0_iphoneos-arm64.deb` from **Liquid Glass 26 v0.1.0**.
+3. Open the package in Sileo or Zebra and install it.
+4. Respring if requested.
 
-Do not install a package from a failed or incomplete build. The first release must be tested on the target iPhone XR before being treated as stable.
+This is a development release. It passed CI compilation and package creation, but has not yet been device-tested on the target iPhone XR.
 
 ## Uninstall
 
