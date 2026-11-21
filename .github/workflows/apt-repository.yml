@@ -1,0 +1,140 @@
+name: Publish APT Repository
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/apt-repository.yml"
+  workflow_run:
+    workflows:
+      - Publish Liquid Glass Release
+    types:
+      - completed
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: apt-repository
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    name: Build and publish Sileo / Zebra repository
+    if: >-
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Install Debian repository tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev apt-utils
+
+      - name: Download all published Debian packages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p public/debs
+
+          mapfile -t tags < <(
+            gh release list --repo "$GITHUB_REPOSITORY" --limit 100 \
+              --json tagName,isDraft,isPrerelease \
+              --jq '.[] | select(.isDraft == false and .isPrerelease == false) | .tagName'
+          )
+
+          if [ "${#tags[@]}" -eq 0 ]; then
+            echo "No published releases found." >&2
+            exit 1
+          fi
+
+          for tag in "${tags[@]}"; do
+            echo "Downloading Debian assets from $tag"
+            gh release download "$tag" --repo "$GITHUB_REPOSITORY" \
+              --pattern '*.deb' --dir public/debs
+          done
+
+          compgen -G 'public/debs/*.deb' >/dev/null
+
+      - name: Generate APT package indexes
+        run: |
+          set -euo pipefail
+          cd public
+
+          dpkg-scanpackages --multiversion debs /dev/null > Packages
+          gzip -n -9c Packages > Packages.gz
+          bzip2 -9c Packages > Packages.bz2
+
+          cat > Release <<'EOF'
+          Origin: mruuid
+          Label: Liquid Glass 26
+          Suite: stable
+          Codename: stable
+          Architectures: iphoneos-arm64
+          Components: main
+          Description: Rootless Liquid Glass packages for Dopamine, Sileo and Zebra
+          EOF
+
+          apt-ftparchive release . >> Release
+
+      - name: Create repository landing page
+        run: |
+          cat > public/index.html <<'EOF'
+          <!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Liquid Glass 26 APT Repository</title>
+            <style>
+              :root { color-scheme: dark; }
+              body { margin: 0; padding: 48px 20px; background: #101319; color: #f4f6fb; font: 16px/1.6 -apple-system, BlinkMacSystemFont, sans-serif; }
+              main { max-width: 760px; margin: auto; padding: 32px; border: 1px solid #343b49; border-radius: 24px; background: #191f2b; }
+              h1 { margin-top: 0; letter-spacing: -.04em; }
+              code { display: block; overflow-wrap: anywhere; padding: 14px; border-radius: 12px; background: #0c1017; color: #b9d9ff; }
+              a { color: #9cc8ff; }
+              .muted { color: #aab4c5; }
+            </style>
+          </head>
+          <body>
+            <main>
+              <h1>Liquid Glass 26</h1>
+              <p class="muted">Rootless APT repository for Dopamine · Sileo · Zebra</p>
+              <h2>Add this source</h2>
+              <code>https://mruuid.github.io/-Liquid-Glass-/</code>
+              <p>Open Sileo or Zebra, choose Sources → Add Source, and paste the URL above.</p>
+              <h2>Packages</h2>
+              <p><a href="./Packages.gz">Packages.gz</a> · <a href="./Release">Release metadata</a></p>
+              <p class="muted">Packages are built for rootless jailbreak environments. Check each package's firmware and dependency requirements before installing.</p>
+              <p><a href="https://github.com/mruuid/-Liquid-Glass-/releases">GitHub Releases</a> · <a href="https://github.com/mruuid/-Liquid-Glass-">Source code</a></p>
+            </main>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Deploy APT repository
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Print repository URL
+        run: echo "APT repository published at ${{ steps.deployment.outputs.page_url }}"
