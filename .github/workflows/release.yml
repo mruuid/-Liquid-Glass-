@@ -1,11 +1,13 @@
 name: Publish Liquid Glass Release
 
 on:
-  push:
+  workflow_run:
+    workflows:
+      - Build Liquid Glass
+    types:
+      - completed
     branches:
       - main
-    paths:
-      - .github/workflows/release.yml
 
 permissions:
   actions: read
@@ -13,7 +15,10 @@ permissions:
 
 jobs:
   publish:
-    name: Publish v0.1.0
+    name: Publish v0.2.0
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_commit.message == 'Finalize Liquid Glass 26 v0.2.0'
     runs-on: ubuntu-latest
 
     steps:
@@ -22,33 +27,36 @@ jobs:
         with:
           name: liquid-glass-deb
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: 44934547940
+          run-id: ${{ github.event.workflow_run.id }}
           path: dist
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.1.0
-          name: Liquid Glass 26 v0.1.0
+          tag_name: v0.2.0
+          target_commitish: ${{ github.event.workflow_run.head_sha }}
+          name: Liquid Glass 26 v0.2.0
           body: |
-            ## Liquid Glass 26 — v0.1.0
+            ## Liquid Glass 26 — v0.2.0
 
-            First rootless development build for Dopamine.
+            Expanded rootless release for Dopamine on iOS 18.
 
-            **Target:** iOS 18.7.1 · iPhone XR (A12)
+            **Target:** iPhone XR (A12) · iOS 18.7.1
             **Package:** Debian .deb for Sileo / Zebra
             **Architectures:** arm64, arm64e
 
-            ### Included
-            - Glass material for UIKit navigation bars, tab bars and toolbars.
-            - Initial SpringBoard glass surfaces for supported Dock, folder, notification and Control Center container classes.
-            - Rootless Theos package configuration.
+            ### New in v0.2.0
+            - Glass treatment for the Lock Screen clock container.
+            - Glass material for supported volume and ringer HUD surfaces.
+            - iOS 27-inspired material refinements: clearer highlights, stronger edge contrast, and adjustable glass intensity.
+            - Spring-based glass entrance transitions.
+            - Settings pane for effect toggles, intensity, and performance mode.
+            - Reduce Motion, Reduce Transparency, and Low Power Mode adaptations.
+            - Cached visual-effect views and idempotent layout hooks.
 
-            ### Installation
-            Download the .deb asset below and install it with Sileo or Zebra on a compatible Dopamine rootless jailbreak.
-
-            This is an initial development build. It has passed CI compilation and package creation, but has not yet been device-tested on an iPhone XR. Private SpringBoard classes and visual coverage may vary by iOS build.
+            This is a development build. CI confirms compilation and Debian packaging, but the package has not yet been tested on a physical iPhone XR. Private SpringBoard classes can vary between iOS builds.
           files: dist/*.deb
+          fail_on_unmatched_files: true
           draft: false
           prerelease: false
           make_latest: true
