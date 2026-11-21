@@ -1,0 +1,80 @@
+Package: com.mruuid.liquidglass26
+Version: 0.1.0
+Architecture: iphoneos-arm64
+Maintainer: mruuid
+Installed-Size: 188
+Depends: firmware (>= 15.0), ellekit | mobilesubstrate
+Filename: debs/com.mruuid.liquidglass26_0.1.0_iphoneos-arm64.deb
+Size: 8722
+MD5sum: 4cc8924cb345f73934f21bababd9649b
+SHA1: 3506fd220bf5e8a3af8758f05418503bef7f4730
+SHA256: 2835d454409187a4e87078b4780021909b40badf4b324d0ab5e4e088652faa71
+Section: Tweaks
+Description: iOS 26-inspired glass materials for selected iOS 18 system interfaces.
+Author: mruuid
+Name: Liquid Glass 26
+
+Package: com.mruuid.liquidglass26
+Version: 0.2.0
+Architecture: iphoneos-arm64
+Maintainer: mruuid
+Installed-Size: 416
+Depends: firmware (>= 18.0), ellekit | mobilesubstrate, preferenceloader
+Filename: debs/com.mruuid.liquidglass26_0.2.0_iphoneos-arm64.deb
+Size: 19972
+MD5sum: 5510e0825141870b11c55448d2aefba3
+SHA1: cb2f212aeca5f99ba574cab7956ea7876ed1119e
+SHA256: 78c9a62b05b3b3ea40241cf2577d3060001270a147c210ff05e734b01eec1299
+Section: Tweaks
+Description: Expanded Liquid Glass simulation for iOS 18 with Lock Screen clock, volume HUD, refined materials and motion.
+Author: mruuid
+Name: Liquid Glass 26
+
+Package: com.mruuid.liquidglass26
+Version: 0.3.0
+Architecture: iphoneos-arm64
+Maintainer: mruuid
+Installed-Size: 416
+Depends: firmware (>= 18.0), ellekit | mobilesubstrate, preferenceloader
+Filename: debs/com.mruuid.liquidglass26_0.3.0_iphoneos-arm64.deb
+Size: 21406
+MD5sum: 18ff4eb88c434f59bc8636382387dd29
+SHA1: 8ddbce21bbc6772e2ec814cf25b07edd1a3cdae1
+SHA256: ae60117f183fb4814e4b9e159e5975a7755a3fc6747ccd12d712e09c4c69d745
+Section: Tweaks
+Description: Liquid Glass visual tweak for iOS 18 with live settings refresh and improved system HUD targeting.
+Author: mruuid
+Name: Liquid Glass 26
+
+Package: com.mruuid.liquidglass26
+Version: 0.3.1
+Architecture: iphoneos-arm64
+Maintainer: mruuid
+Installed-Size: 416
+Depends: firmware (>= 18.0), ellekit | mobilesubstrate, preferenceloader
+Filename: debs/com.mruuid.liquidglass26_0.3.1_iphoneos-arm64.deb
+Size: 21498
+MD5sum: dc0d839a1cf1ea51404a8b074775dbc2
+SHA1: 6e1da37f8ea8b2eb6c9152547b91f998832eb7f2
+SHA256: d378998b3189ec49274e36b48476574d06879983298e1d15557f6f0fca170236
+Section: Tweaks
+Description: Stability hotfix for iOS 18; disables experimental SpringBoard injection.
+Author: mruuid
+Name: Liquid Glass 26
+
+Package: com.mruuid.liquidglass26
+Version: 0.3.2
+Architecture: iphoneos-arm64
+Maintainer: mruuid
+Installed-Size: 420
+Depends: firmware (>= 18.0), ellekit | mobilesubstrate, preferenceloader
+Filename: debs/com.mruuid.liquidglass26_0.3.2_iphoneos-arm64.deb
+Size: 22570
+MD5sum: 6e5cb3b046b1823faec5daad4ae91bed
+SHA1: dff3b21dc331821afeab545511d82f7cc0ae0c16
+SHA256: ebd2dac58cd1d30db088149d076d911753147b6bbc000b2c09cb0b5f6422d6ca
+Section: Tweaks
+Description: Liquid Glass material for iOS 18: Lock Screen clock, Dock, folders, volume HUD and system bars. Rootless.
+Author: mruuid
+Name: Liquid Glass 26
+

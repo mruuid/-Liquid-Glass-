@@ -1,0 +1,28 @@
+Origin: mruuid
+Label: Liquid Glass 26
+Suite: stable
+Codename: stable
+Architectures: iphoneos-arm64
+Components: main
+Description: Rootless Liquid Glass packages for Dopamine, Sileo and Zebra
+Date: Sat, 21 Nov 2026 20:41:34 +0000
+MD5Sum:
+ 87acc20e0f1cf3c4425c03418cb728ed             2916 Packages
+ d4608cca82e059e682c8d60ac658d294             1211 Packages.bz2
+ f5f2c42fd0166e8411a844e61a4aa295             1047 Packages.gz
+ 3729254c82a432088f7379d20f0a858b             1100 Packages.xz
+SHA1:
+ 4c78cd4014ecc7fc434cd460cbd2e00e2ef4c8ec             2916 Packages
+ 57b775af3154e78e95e4651d1711a37d22956e9c             1211 Packages.bz2
+ 2e385612511fd99253a5eb4dfce9323b43c22707             1047 Packages.gz
+ a414002d7035050f101a829e063b5636a14617fd             1100 Packages.xz
+SHA256:
+ cfbe31c43ad3b464cbd5ec4ad5beb8e97da3bf821d1f95f50322700a7951d949             2916 Packages
+ 86229d914bcf3735f590e6a0551a213e17e9141eb7b67ca706f644f5c84d1819             1211 Packages.bz2
+ 592158877822e2e65359e9d5afe3d47a0bd0a835f092469ea6a6b0e4dd9722a4             1047 Packages.gz
+ c73e436fd56b2a0829f62c1346eac16080558bed2bdaafc2dd1c259cd81e357f             1100 Packages.xz
+SHA512:
+ e7015eee099883b67ac17087cde6d7b75b1df3dcd27c41c875981798f1e84dbb326ce9364ec7ea8a457d744fe3298ddcc506d10a962aa5df6ffcdf27a44d800e             2916 Packages
+ 6236f50895e2a30275e0c0d41b6f0210f74086559d9137728cf75cc8f9e05c7cbd4a84bbf0e0b3f05b925fb3d86ef1c383d8c3e09b9067a3bdffbca6039bc4df             1211 Packages.bz2
+ 5c0c3bc85f916fa4e911c48717756c381d7023134194c5cdd14afc0cb5dfec07074a1ef7869b1d5beea6c95c4112d0cae7246948d9d8d40a0c2e4b3f3d54d0d2             1047 Packages.gz
+ 04a2fda2dd6281c0e90e6079ffdf353292a5e6b938afb16a0847db02ae0f9815a890a14702fca81ee1588d8b9b8fdf677a0a211f834402e6371d87ffacce88e8             1100 Packages.xz
