@@ -1,0 +1,18 @@
+{
+    Filter = {
+        Bundles = (
+            "com.apple.springboard",
+            "com.apple.Preferences",
+            "com.apple.mobilesafari",
+            "com.apple.MobileSMS",
+            "com.apple.mobilemail",
+            "com.apple.mobileslideshow",
+            "com.apple.camera",
+            "com.apple.mobilephone",
+            "com.apple.Music",
+            "com.apple.AppStore",
+            "com.apple.calculator",
+            "com.apple.weather"
+        );
+    };
+}
