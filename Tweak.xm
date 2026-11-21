@@ -1,3 +1,8 @@
+// Liquid Glass 26 v0.3.2
+// SpringBoard effects restored with a hardened layout hook:
+// a re-entrancy barrier plus per-surface exception containment keep one
+// misbehaving surface from crashing the host app or SpringBoard.
+
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
 #import <objc/runtime.h>
@@ -16,6 +21,7 @@ static const void *kLGClockGlassViewKey = &kLGClockGlassViewKey;
 static const void *kLGClockLabelKey = &kLGClockLabelKey;
 static const void *kLGGlassGradientKey = &kLGGlassGradientKey;
 static const void *kLGGlassProfileKey = &kLGGlassProfileKey;
+static const void *kLGLayoutHookActiveKey = &kLGLayoutHookActiveKey;
 
 static NSMutableDictionary<NSString *, NSValue *> *gLGOriginalLayoutImplementations;
 static NSDictionary<NSString *, NSNumber *> *gLGPrivateSurfaceRadii;
@@ -496,44 +502,50 @@ static void LGLayoutSubviewsHook(UIView *view, SEL selector) {
         ((void (*)(id, SEL))originalImplementation)(view, selector);
     }
 
-    if ([view isKindOfClass:[UINavigationBar class]]) {
-        LGApplyNavigationBarAppearance((UINavigationBar *)view);
-        return;
-    }
+    // Re-entrancy barrier: applying appearances or inserting subviews can
+    // trigger a nested layout pass on the same view. Without this guard a
+    // nested pass could recurse and overflow the stack in the host process.
+    if (objc_getAssociatedObject(view, kLGLayoutHookActiveKey)) return;
+    objc_setAssociatedObject(view, kLGLayoutHookActiveKey, @YES,
+                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 
-    if ([view isKindOfClass:[UITabBar class]]) {
-        LGApplyTabBarAppearance((UITabBar *)view);
-        return;
-    }
+    @try {
+        if ([view isKindOfClass:[UINavigationBar class]]) {
+            LGApplyNavigationBarAppearance((UINavigationBar *)view);
+        } else if ([view isKindOfClass:[UITabBar class]]) {
+            LGApplyTabBarAppearance((UITabBar *)view);
+        } else if ([view isKindOfClass:[UIToolbar class]]) {
+            LGApplyToolbarAppearance((UIToolbar *)view);
+        } else {
+            NSString *className = NSStringFromClass(object_getClass(view));
+            if ([className isEqualToString:@"SBFLockScreenDateView"]) {
+                LGApplyLockScreenClock(view);
+            } else {
+                BOOL isHUD = [className containsString:@"VolumeHUD"] ||
+                             [className containsString:@"RingerHUD"] ||
+                             [className isEqualToString:@"SBElasticSliderView"];
 
-    if ([view isKindOfClass:[UIToolbar class]]) {
-        LGApplyToolbarAppearance((UIToolbar *)view);
-        return;
-    }
-
-    NSString *className = NSStringFromClass(object_getClass(view));
-    if ([className isEqualToString:@"SBFLockScreenDateView"]) {
-        LGApplyLockScreenClock(view);
-        return;
-    }
-
-    BOOL isHUD = [className containsString:@"VolumeHUD"] ||
-                 [className containsString:@"RingerHUD"] ||
-                 [className isEqualToString:@"SBElasticSliderView"];
-
-    if (isHUD) {
-        CGFloat largestHUDArea = 0.0;
-        UIView *hudSurface = LGFindHUDSurfaceInTree(view, &largestHUDArea);
-        if (hudSurface) {
-            LGApplyGlassToPrivateSurface(hudSurface, 28.0, YES);
+                if (isHUD) {
+                    CGFloat largestHUDArea = 0.0;
+                    UIView *hudSurface = LGFindHUDSurfaceInTree(view, &largestHUDArea);
+                    if (hudSurface) {
+                        LGApplyGlassToPrivateSurface(hudSurface, 28.0, YES);
+                    }
+                } else {
+                    CGFloat radius = LGPrivateSurfaceRadiusForObject(view);
+                    if (radius > 0.0) {
+                        LGApplyGlassToPrivateSurface(view, radius, NO);
+                    }
+                }
+            }
         }
-        return;
+    } @catch (NSException *exception) {
+        NSLog(@"[LiquidGlass] guarded exception for %@: %@",
+              NSStringFromClass(object_getClass(view)), exception);
     }
 
-    CGFloat radius = LGPrivateSurfaceRadiusForObject(view);
-    if (radius > 0.0) {
-        LGApplyGlassToPrivateSurface(view, radius, NO);
-    }
+    objc_setAssociatedObject(view, kLGLayoutHookActiveKey, nil,
+                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 static void LGInstallLayoutHook(Class cls) {
@@ -631,7 +643,10 @@ static void LGPreferencesChanged(CFNotificationCenterRef center,
     });
 }
 
-// Liquid Glass 26 v0.3.1 Safe Mode hotfix.
+// Liquid Glass 26 v0.3.2. SpringBoard effects are enabled by default again:
+// every hook is guarded by class-existence checks, the layout hook carries a
+// re-entrancy barrier, and each application pass runs inside @try/@catch so
+// a single bad surface can never take down SpringBoard or a host app.
 __attribute__((constructor))
 static void LiquidGlassInitialize(void) {
     @autoreleasepool {
@@ -649,13 +664,9 @@ static void LiquidGlassInitialize(void) {
 
         NSString *bundleIdentifier = NSBundle.mainBundle.bundleIdentifier;
 
-        // Safety hotfix: never activate private SpringBoard hooks by default.
-        // Those classes are undocumented and can differ across iOS point releases.
         if ([bundleIdentifier isEqualToString:@"com.apple.springboard"]) {
-            if (LGPreferenceEnabled(@"ExperimentalSpringBoardHooks", NO)) {
-                LGInstallUIKitHooks();
-                LGInstallSpringBoardHooks();
-            }
+            LGInstallUIKitHooks();
+            LGInstallSpringBoardHooks();
             return;
         }
 
