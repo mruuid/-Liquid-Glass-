@@ -15,10 +15,10 @@ permissions:
 
 jobs:
   publish:
-    name: Publish v0.2.0
+    name: Publish v0.3.0
     if: >-
       github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.head_commit.message == 'Finalize Liquid Glass 26 v0.2.0'
+      github.event.workflow_run.head_commit.message == 'Finalize Liquid Glass 26 v0.3.0'
     runs-on: ubuntu-latest
 
     steps:
@@ -30,31 +30,39 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           path: dist
 
+      - name: Verify Debian package
+        run: |
+          set -e
+          shopt -s nullglob
+          packages=(dist/*.deb)
+          test "${#packages[@]}" -eq 1
+          dpkg-deb --info "${packages[0]}"
+          dpkg-deb --field "${packages[0]}" Package | grep -Fx 'com.mruuid.liquidglass26'
+          dpkg-deb --field "${packages[0]}" Version | grep -Fx '0.3.0'
+          dpkg-deb --field "${packages[0]}" Architecture | grep -Fx 'iphoneos-arm64'
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.2.0
+          tag_name: v0.3.0
           target_commitish: ${{ github.event.workflow_run.head_sha }}
-          name: Liquid Glass 26 v0.2.0
+          name: Liquid Glass 26 v0.3.0
           body: |
-            ## Liquid Glass 26 — v0.2.0
+            ## Liquid Glass 26 — v0.3.0
 
-            Expanded rootless release for Dopamine on iOS 18.
+            Rootless update for Dopamine on iOS 18.
 
             **Target:** iPhone XR (A12) · iOS 18.7.1
             **Package:** Debian .deb for Sileo / Zebra
             **Architectures:** arm64, arm64e
 
-            ### New in v0.2.0
-            - Glass treatment for the Lock Screen clock container.
-            - Glass material for supported volume and ringer HUD surfaces.
-            - iOS 27-inspired material refinements: clearer highlights, stronger edge contrast, and adjustable glass intensity.
-            - Spring-based glass entrance transitions.
-            - Settings pane for effect toggles, intensity, and performance mode.
-            - Reduce Motion, Reduce Transparency, and Low Power Mode adaptations.
-            - Cached visual-effect views and idempotent layout hooks.
+            ### What's new
+            - Live preference refresh: visible interfaces are marked for layout again after settings change, so most tweaks apply without relaunching apps or respringing.
+            - Improved volume/ringer HUD discovery: scans nested HUD views and recognizes both horizontal and vertical capsule-shaped surfaces.
+            - More complete visual profile invalidation for glass intensity, Reduce Transparency, material refinements, and Performance Mode.
+            - Existing Lock Screen clock, Dock/folder, notification, Control Center, system-bar and accessibility options retained.
 
-            This is a development build. CI confirms compilation and Debian packaging, but the package has not yet been tested on a physical iPhone XR. Private SpringBoard classes can vary between iOS builds.
+            This is a development build. CI validates compilation and Debian packaging; it does not replace testing on a physical device. Private SpringBoard class names and layouts can vary between iOS builds.
           files: dist/*.deb
           fail_on_unmatched_files: true
           draft: false
