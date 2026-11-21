@@ -6,4 +6,4 @@ Description: iOS 26-inspired glass materials for selected iOS 18 system interfac
 Maintainer: mruuid
 Author: mruuid
 Section: Tweaks
-Depends: firmware (>= 15.0), mobilesubstrate
+Depends: firmware (>= 15.0), ellekit | mobilesubstrate
