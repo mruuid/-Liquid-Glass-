@@ -10,7 +10,7 @@ on:
       - main
 
 permissions:
-  actions: read
+  actions: write
   contents: write
 
 jobs:
@@ -68,3 +68,8 @@ jobs:
           draft: false
           prerelease: false
           make_latest: true
+
+      - name: Rebuild APT repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run apt-repository.yml --repo "$GITHUB_REPOSITORY"
