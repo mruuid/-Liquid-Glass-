@@ -63,9 +63,13 @@ Add the official Liquid Glass 26 source to Sileo or Zebra:
 
 `https://raw.githubusercontent.com/mruuid/-Liquid-Glass-/gh-pages/`
 
-Open **Sources → Add Source**, paste the URL, and confirm. The repository index is automatically rebuilt when a new GitHub release is published.
+[Add to Sileo](sileo://source/https://raw.githubusercontent.com/mruuid/-Liquid-Glass-/gh-pages/) · [Add to Zebra](zbra://sources/add/https://raw.githubusercontent.com/mruuid/-Liquid-Glass-/gh-pages/)
 
-[Open the APT repository](https://raw.githubusercontent.com/mruuid/-Liquid-Glass-/gh-pages/)
+In either app, open **Sources → Add Source**, paste the URL above, and confirm. The repository automatically rebuilds after each published GitHub release.
+
+The APT index includes all published Liquid Glass versions for version selection and downgrades. The repository is served over HTTPS, but its `Release` file is currently **not GPG-signed**.
+
+[Browse repository files](https://github.com/mruuid/-Liquid-Glass-/tree/gh-pages)
 
 ## Installation
 
