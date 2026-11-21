@@ -646,11 +646,19 @@ static void LiquidGlassInitialize(void) {
             CFNotificationSuspensionBehaviorDeliverImmediately
         );
 
-        LGInstallUIKitHooks();
-
         NSString *bundleIdentifier = NSBundle.mainBundle.bundleIdentifier;
+
+        // Safety hotfix: never activate private SpringBoard hooks by default.
+        // Those classes are undocumented and can differ across iOS point releases.
         if ([bundleIdentifier isEqualToString:@"com.apple.springboard"]) {
-            LGInstallSpringBoardHooks();
+            if (LGPreferenceEnabled(@"ExperimentalSpringBoardHooks", NO)) {
+                LGInstallUIKitHooks();
+                LGInstallSpringBoardHooks();
+            }
+            return;
         }
+
+        // Keep the supported UIKit appearance hooks in selected user-facing apps.
+        LGInstallUIKitHooks();
     }
 }
