@@ -205,21 +205,6 @@ static void LGLayoutSubviewsHook(UIView *view, SEL selector) {
     }
 }
 
-static IMP LGResolveInheritedOriginalImplementation(Class cls) {
-    for (Class superclass = class_getSuperclass(cls);
-         superclass != Nil;
-         superclass = class_getSuperclass(superclass)) {
-        NSValue *storedImplementation =
-            gLGOriginalLayoutImplementations[NSStringFromClass(superclass)];
-
-        if (storedImplementation) {
-            return (IMP)storedImplementation.pointerValue;
-        }
-    }
-
-    return NULL;
-}
-
 static void LGInstallLayoutHook(Class cls) {
     if (!cls) {
         return;
@@ -234,16 +219,6 @@ static void LGInstallLayoutHook(Class cls) {
     IMP originalImplementation = method_getImplementation(method);
     if (originalImplementation == (IMP)LGLayoutSubviewsHook) {
         return;
-    }
-
-    // A subclass may inherit our hook from an already-hooked superclass.
-    // Store the superclass's real implementation, not the hook itself,
-    // otherwise layoutSubviews would recurse indefinitely.
-    if (originalImplementation == (IMP)LGLayoutSubviewsHook) {
-        originalImplementation = LGResolveInheritedOriginalImplementation(cls);
-        if (!originalImplementation) {
-            return;
-        }
     }
 
     const char *typeEncoding = method_getTypeEncoding(method);
@@ -262,8 +237,7 @@ static void LGInstallLayoutHook(Class cls) {
         );
     }
 
-    if (originalImplementation &&
-        originalImplementation != (IMP)LGLayoutSubviewsHook) {
+    if (originalImplementation) {
         gLGOriginalLayoutImplementations[NSStringFromClass(cls)] =
             [NSValue valueWithPointer:originalImplementation];
     }
