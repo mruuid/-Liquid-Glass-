@@ -619,9 +619,14 @@ static void LGPreferencesChanged(CFNotificationCenterRef center,
 
         // Refresh already-visible interfaces so preference changes take effect
         // without requiring an app relaunch or respring.
-        for (UIWindow *window in UIApplication.sharedApplication.windows) {
-            LGMarkViewTreeForLayout(window);
-            [window layoutIfNeeded];
+        for (UIScene *scene in UIApplication.sharedApplication.connectedScenes) {
+            if (![scene isKindOfClass:[UIWindowScene class]]) continue;
+
+            UIWindowScene *windowScene = (UIWindowScene *)scene;
+            for (UIWindow *window in windowScene.windows) {
+                LGMarkViewTreeForLayout(window);
+                [window layoutIfNeeded];
+            }
         }
     });
 }
