@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>title</key>
+    <string>Liquid Glass 26</string>
+    <key>items</key>
+    <array>
+        <dict>
+            <key>cell</key><string>PSGroupCell</string>
+            <key>label</key><string>General</string>
+            <key>footerText</key><string>Configure the Liquid Glass material and visual effects.</string>
+        </dict>
+        <dict>
+            <key>cell</key><string>PSSwitchCell</string>
+            <key>label</key><string>Enable Liquid Glass</string>
+            <key>defaults</key><string>com.mruuid.liquidglass26</string>
+            <key>key</key><string>Enabled</string>
+            <key>default</key><true/>
+        </dict>
+        <dict>
+            <key>cell</key><string>PSSliderCell</string>
+            <key>label</key><string>Glass Intensity</string>
+            <key>defaults</key><string>com.mruuid.liquidglass26</string>
+            <key>key</key><string>GlassIntensity</string>
+            <key>default</key><integer>72</integer>
+            <key>min</key><integer>0</integer>
+            <key>max</key><integer>100</integer>
+            <key>showValue</key><true/>
+        </dict>
+        <dict>
+            <key>cell</key><string>PSSwitchCell</string>
+            <key>label</key><string>iOS 27 Material Refinements</string>
+            <key>defaults</key><string>com.mruuid.liquidglass26</string>
+            <key>key</key><string>iOS27RefinementsEnabled</string>
+            <key>default</key><true/>
+        </dict>
+        <dict>
+            <key>cell</key><string>PSGroupCell</string>
+            <key>label</key><string>System Interfaces</string>
+        </dict>
+        <dict>
+            <key>cell</key><string>PSSwitchCell</string>
+            <key>label</key><string>System Bars</string>
+            <key>defaults</key><string>com.mruuid.liquidglass26</string>
+            <key>key</key><string>SystemPanelsEnabled</string>
+            <key>default</key><true/>
+        </dict>
+        <dict>
+            <key>cell</key><string>PSSwitchCell</string>
+            <key>label</key><string>Lock Screen Clock</string>
+            <key>defaults</key><string>com.mruuid.liquidglass26</string>
+            <key>key</key><string>LockScreenClockEnabled</string>
+            <key>default</key><true/>
+        </dict>
+        <dict>
+            <key>cell</key><string>PSSwitchCell</string>
+            <key>label</key><string>Volume and Ringer HUD</string>
+            <key>defaults</key><string>com.mruuid.liquidglass26</string>
+            <key>key</key><string>VolumeHUDEnabled</string>
+            <key>default</key><true/>
+        </dict>
+        <dict>
+            <key>cell</key><string>PSSwitchCell</string>
+            <key>label</key><string>Dock and Folders</string>
+            <key>defaults</key><string>com.mruuid.liquidglass26</string>
+            <key>key</key><string>DockAndFoldersEnabled</string>
+            <key>default</key><true/>
+        </dict>
+        <dict>
+            <key>cell</key><string>PSGroupCell</string>
+            <key>label</key><string>Performance</string>
+            <key>footerText</key><string>Performance Mode disables entrance animations. Reduce Motion and Reduce Transparency accessibility preferences are always respected.</string>
+        </dict>
+        <dict>
+            <key>cell</key><string>PSSwitchCell</string>
+            <key>label</key><string>Performance Mode</string>
+            <key>defaults</key><string>com.mruuid.liquidglass26</string>
+            <key>key</key><string>PerformanceMode</string>
+            <key>default</key><false/>
+        </dict>
+    </array>
+</dict>
+</plist>
