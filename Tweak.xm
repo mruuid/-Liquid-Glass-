@@ -185,6 +185,13 @@ static void LGConfigureGlassView(UIVisualEffectView *glassView, CGFloat radius, 
     }
 }
 
+static NSInteger LGAppearanceProfile(void) {
+    return (NSInteger)round(LGGlassIntensity() * 100.0) +
+           (LGReduceTransparency() ? 1000 : 0) +
+           (LGPreferenceEnabled(@"iOS27RefinementsEnabled", YES) ? 2000 : 0) +
+           (LGPreferenceEnabled(@"PerformanceMode", NO) ? 4000 : 0);
+}
+
 static void LGApplyNavigationBarAppearance(UINavigationBar *bar) {
     if (!bar) return;
 
@@ -211,7 +218,7 @@ static void LGApplyNavigationBarAppearance(UINavigationBar *bar) {
         );
     }
 
-    NSInteger profile = (NSInteger)round(LGGlassIntensity() * 100.0);
+    NSInteger profile = LGAppearanceProfile();
     NSNumber *applied = objc_getAssociatedObject(bar, kLGNavAppearanceAppliedKey);
     if (applied && applied.integerValue == profile) return;
 
@@ -259,7 +266,7 @@ static void LGApplyTabBarAppearance(UITabBar *bar) {
         );
     }
 
-    NSInteger profile = (NSInteger)round(LGGlassIntensity() * 100.0);
+    NSInteger profile = LGAppearanceProfile();
     NSNumber *applied = objc_getAssociatedObject(bar, kLGTabAppearanceAppliedKey);
     if (applied && applied.integerValue == profile) return;
 
@@ -306,7 +313,7 @@ static void LGApplyToolbarAppearance(UIToolbar *toolbar) {
         );
     }
 
-    NSInteger profile = (NSInteger)round(LGGlassIntensity() * 100.0);
+    NSInteger profile = LGAppearanceProfile();
     NSNumber *applied = objc_getAssociatedObject(toolbar, kLGToolbarAppearanceAppliedKey);
     if (applied && applied.integerValue == profile) return;
 
@@ -432,11 +439,33 @@ static void LGApplyLockScreenClock(UIView *dateView) {
 static BOOL LGIsPillSizedHUD(UIView *view) {
     CGSize screen = UIScreen.mainScreen.bounds.size;
     CGSize size = view.bounds.size;
+    CGFloat shortSide = MIN(size.width, size.height);
+    CGFloat longSide = MAX(size.width, size.height);
 
-    if (size.width < 48.0 || size.height < 24.0) return NO;
+    if (shortSide < 26.0 || longSide < 48.0) return NO;
+    if ((longSide / MAX(shortSide, 1.0)) < 1.35) return NO;
     if (size.width > screen.width * 0.92) return NO;
     if (size.height > screen.height * 0.30) return NO;
     return YES;
+}
+
+static UIView *LGFindHUDSurfaceInTree(UIView *root, CGFloat *largestArea) {
+    UIView *best = nil;
+
+    if (LGIsPillSizedHUD(root)) {
+        CGFloat area = root.bounds.size.width * root.bounds.size.height;
+        if (area > *largestArea) {
+            *largestArea = area;
+            best = root;
+        }
+    }
+
+    for (UIView *subview in root.subviews) {
+        UIView *candidate = LGFindHUDSurfaceInTree(subview, largestArea);
+        if (candidate) best = candidate;
+    }
+
+    return best;
 }
 
 static IMP LGOriginalLayoutImplementationForObject(id object) {
@@ -492,8 +521,12 @@ static void LGLayoutSubviewsHook(UIView *view, SEL selector) {
                  [className containsString:@"RingerHUD"] ||
                  [className isEqualToString:@"SBElasticSliderView"];
 
-    if (isHUD && LGIsPillSizedHUD(view)) {
-        LGApplyGlassToPrivateSurface(view, 28.0, YES);
+    if (isHUD) {
+        CGFloat largestHUDArea = 0.0;
+        UIView *hudSurface = LGFindHUDSurfaceInTree(view, &largestHUDArea);
+        if (hudSurface) {
+            LGApplyGlassToPrivateSurface(hudSurface, 28.0, YES);
+        }
         return;
     }
 
@@ -569,6 +602,13 @@ static void LGInstallSpringBoardHooks(void) {
     }
 }
 
+static void LGMarkViewTreeForLayout(UIView *view) {
+    [view setNeedsLayout];
+    for (UIView *subview in view.subviews) {
+        LGMarkViewTreeForLayout(subview);
+    }
+}
+
 static void LGPreferencesChanged(CFNotificationCenterRef center,
                                  void *observer,
                                  CFStringRef name,
@@ -576,6 +616,13 @@ static void LGPreferencesChanged(CFNotificationCenterRef center,
                                  CFDictionaryRef userInfo) {
     dispatch_async(dispatch_get_main_queue(), ^{
         LGReloadPreferences();
+
+        // Refresh already-visible interfaces so preference changes take effect
+        // without requiring an app relaunch or respring.
+        for (UIWindow *window in UIApplication.sharedApplication.windows) {
+            LGMarkViewTreeForLayout(window);
+            [window layoutIfNeeded];
+        }
     });
 }
 
