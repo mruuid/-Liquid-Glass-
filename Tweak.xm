@@ -631,6 +631,7 @@ static void LGPreferencesChanged(CFNotificationCenterRef center,
     });
 }
 
+// Liquid Glass 26 v0.3.1 Safe Mode hotfix.
 __attribute__((constructor))
 static void LiquidGlassInitialize(void) {
     @autoreleasepool {
