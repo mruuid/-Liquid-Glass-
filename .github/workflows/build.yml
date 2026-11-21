@@ -9,6 +9,7 @@ on:
     paths-ignore:
       - ".github/workflows/release.yml"
       - ".github/workflows/apt-repository.yml"
+      - ".github/workflows/repository.yml"
       - "README.md"
   pull_request:
   workflow_dispatch:
