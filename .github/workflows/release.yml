@@ -1,0 +1,57 @@
+name: Publish Liquid Glass Release
+
+on:
+  workflow_run:
+    workflows:
+      - Build Liquid Glass
+    types:
+      - completed
+    branches:
+      - main
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish:
+    name: Publish v0.1.0
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download the tested Debian package
+        uses: actions/download-artifact@v4
+        with:
+          name: liquid-glass-deb
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          path: dist
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v0.1.0
+          name: Liquid Glass 26 v0.1.0
+          body: |
+            ## Liquid Glass 26 — v0.1.0
+
+            First rootless development build for Dopamine.
+
+            **Target:** iOS 18.7.1 · iPhone XR (A12)
+            **Package:** Debian .deb for Sileo / Zebra
+            **Architectures:** arm64, arm64e
+
+            ### Included
+            - Glass material for UIKit navigation bars, tab bars and toolbars.
+            - Initial SpringBoard glass surfaces for supported Dock, folder, notification and Control Center container classes.
+            - Rootless Theos package configuration.
+
+            ### Installation
+            Download the .deb asset below and install it with Sileo or Zebra on a compatible Dopamine rootless jailbreak.
+
+            This is an initial development build. It has passed CI compilation and package creation, but has not yet been device-tested on an iPhone XR. Private SpringBoard classes and visual coverage may vary by iOS build.
+          files: dist/*.deb
+          draft: false
+          prerelease: false
+          make_latest: true
