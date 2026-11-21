@@ -239,7 +239,7 @@ static void LGInstallLayoutHook(Class cls) {
 
     if (originalImplementation) {
         gLGOriginalLayoutImplementations[NSStringFromClass(cls)] =
-            [NSValue valueWithPointer:originalImplementation];
+            [NSValue valueWithPointer:(const void *)originalImplementation];
     }
 }
 
