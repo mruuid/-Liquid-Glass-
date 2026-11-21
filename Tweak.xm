@@ -125,7 +125,6 @@ static void LGAddSpecularHighlight(UIVisualEffectView *glassView) {
 
     CAGradientLayer *gradient = [CAGradientLayer layer];
     gradient.frame = glassView.contentView.bounds;
-    gradient.autoresizingMask = kCALayerWidthSizable | kCALayerHeightSizable;
     gradient.startPoint = CGPointMake(0.5, 0.0);
     gradient.endPoint = CGPointMake(0.5, 1.0);
     gradient.colors = @[
@@ -165,6 +164,8 @@ static void LGConfigureGlassView(UIVisualEffectView *glassView, CGFloat radius, 
     }
 
     LGAddSpecularHighlight(glassView);
+    CAGradientLayer *gradient = objc_getAssociatedObject(glassView, kLGGlassGradientKey);
+    gradient.frame = glassView.contentView.bounds;
     if (isHUD && LGPreferenceEnabled(@"iOS27RefinementsEnabled", YES)) {
         glassView.layer.shadowColor = [UIColor colorWithWhite:0.0 alpha:1.0].CGColor;
         glassView.layer.shadowOpacity = 0.12;
